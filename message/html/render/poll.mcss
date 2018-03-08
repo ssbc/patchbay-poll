@@ -1,0 +1,30 @@
+PollCard {
+  padding: 1rem
+
+  border: 1px solid gainsboro
+
+  margin-bottom: 1rem
+
+  div.body {
+    margin-bottom: 1rem
+  }
+
+  div.choices {
+    button {
+      font: .8rem
+      margin: 0 .5rem 0 0
+      min-width: 4rem
+    }
+
+    margin-bottom: 1rem
+  }
+
+  div.closesAt {
+    font-style: italics
+    margin-bottom: 1rem
+  }
+
+  div.positions {
+
+  }
+}
