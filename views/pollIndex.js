@@ -2,25 +2,32 @@ const { h, Value } = require('mutant')
 const ScuttlePoll = require('scuttle-poll')
 const { parsePoll } = require('ssb-poll-schema')
 
-const pull = require('pull-stream')
 const Scroller = require('mutant-scroll')
 const next = require('pull-next-step')
 
-const PollCard = require('./pollCard')
+const PollCard = require('./com/pollCard')
 
-module.exports = function pollIndex ({ server, createPollStream, mdRenderer, openNewPage }) {
+module.exports = function pollIndex ({ createPollStream, mdRenderer, openNewPage }) {
   if (!mdRenderer) mdRenderer = (text) => text
   // TODO wire up mdRenderer (inject or require?)
   // TODO extract createPollStream into ScuttlePoll
 
   var viewMode = Value('future')
-  var page = Value(createPage('future'))
+  var page = createPage('future')
 
   // this doesn't work
-  viewMode(mode => {
+  viewMode(updateToMode)
+  function updateToMode (mode) {
     console.log(mode)
-    page.set(createPage(mode))
-  })
+    const parentEl = page.parentElement
+    if (!parentEl) {
+      console.log('not there yet!')
+      setTimeout(() => updateToMode(mode), 200)
+      return
+    }
+    parentEl.removeChild(page)
+    parentEl.appendChild(createPage(mode))
+  }
 
   return page
 
@@ -47,7 +54,7 @@ module.exports = function pollIndex ({ server, createPollStream, mdRenderer, ope
             const { closesAt } = parsePoll(msg)
 
             if (new Date(closesAt) < new Date()) return// TODO figure out nice way to make this update
-            return PollCard({ msg, server, mdRenderer })
+            return PollCard({ msg, mdRenderer })
           }
         }))
 
@@ -60,7 +67,7 @@ module.exports = function pollIndex ({ server, createPollStream, mdRenderer, ope
             const { closesAt } = parsePoll(msg)
 
             if (new Date(closesAt) > new Date()) return// TODO figure out nice way to make this update
-            return PollCard({ msg, server, mdRenderer })
+            return PollCard({ msg, mdRenderer })
           }
         }))
     }

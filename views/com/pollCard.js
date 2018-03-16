@@ -1,12 +1,10 @@
 // const ScuttlePoll = require('scuttle-poll')
 const { parsePoll } = require('ssb-poll-schema')
 const { h, Struct, map } = require('mutant')
-const renderer = require('ssb-markdown')
 
 module.exports = function PollCard ({ msg, mdRenderer }) {
   // const { title, body, closesAt } = parsePoll({ poll: msg })
   // TODO reinstate this
-  mdRenderer = mdRenderer || basicMd
   const title = 'Do you want help converting your company to a coop?'
   const body = 'coops are the way of the future, you can read more about them here'
   const closesAt = new Date()
@@ -36,11 +34,6 @@ module.exports = function PollCard ({ msg, mdRenderer }) {
     // }))
 }
 
-function basicMd (text) {
-  return h('Markdown', {
-    innerHTML: renderer.block(text)
-  })
-}
 
 /// // LEFTOVERS vv
 // TODO - make the poll.obs.get to collapse all this !

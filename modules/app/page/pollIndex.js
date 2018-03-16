@@ -1,5 +1,6 @@
 const { h } = require('mutant')
 const nest = require('depnest')
+const ScuttlePoll = require('scuttle-poll')
 const isPoll = require('scuttle-poll/isPoll')
 const pull = require('pull-stream')
 const page = require('../../../views/pollIndex')
@@ -29,34 +30,12 @@ exports.create = function (api) {
 
   function pollIndex (path) {
     return page({
-      server: api.sbot.obs.connection,
-      createPollStream
+      scuttlePoll: ScuttlePoll(api.sbot.obs.connection),
+      createPollStream: (opts) => pull(
+        api.feed.pull.type('poll')(opts), // TODO update patchcore
+        pull.through(console.log),
+        pull.filter(isPoll)
+      )
     })
-  }
-
-  function createPollStream () {
-    return (opts) => pull(
-      api.feed.pull.type('poll')(opts), // TODO update patchcore
-      pull.filter(isPoll)
-    )
-
-    // NOTE an attempt at mocking a feed
-    return pull.values([{
-      key: 'something',
-      value: {
-        author: 'dave',
-        content: {
-          type: 'poll',
-          version: 'v1',
-          title: 'should I host a wellington savings pool meetup?',
-          body: 'savings pools involve money, but are really about exploring community dynamics, trust, and dreaming about a better future',
-          closesAt: '2018-03-20T03:40:06.222Z',
-          details: {
-            type: 'chooseOne',
-            choices: ['lasagne', 'avos', 'tacos']
-          }
-        }
-      }
-    }])
   }
 }
