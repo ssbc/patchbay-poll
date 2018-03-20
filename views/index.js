@@ -5,7 +5,7 @@ const { parsePoll } = require('ssb-poll-schema')
 const Scroller = require('mutant-scroll')
 const next = require('pull-next-step')
 
-const PollCard = require('./com/pollCard')
+const PollCard = require('./com/poll-card')
 
 module.exports = function pollIndex ({ createPollStream, mdRenderer, openNewPage }) {
   if (!mdRenderer) mdRenderer = (text) => text
@@ -33,7 +33,7 @@ module.exports = function pollIndex ({ createPollStream, mdRenderer, openNewPage
 
   function createPage (mode) {
     const base = {
-      classList: ['-pollIndex'],
+      classList: ['PollIndex'],
       prepend: h('header', [
         h('h1', ['Polls', mode]),
         h('button', { 'ev-click': openNewPage }, 'New Poll'),

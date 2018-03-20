@@ -1,6 +1,6 @@
 const nest = require('depnest')
 const isPoll = require('scuttle-poll/isPoll')
-const pollCard = require('../../../../views/pollCard')
+const pollCard = require('../../../../views/poll-card')
 
 exports.gives = nest('message.html.render')
 

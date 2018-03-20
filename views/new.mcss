@@ -1,0 +1,53 @@
+PollNew -chooseOne {
+  font-family: sans-serif
+  font-size: 1rem
+  
+  h1 {}
+
+  div.field {
+    display: flex
+    align-items: baseline
+
+    margin-bottom: 1rem
+
+    label {
+      font-weight: bold 
+      min-width: 8rem
+    }
+
+    input, textarea {
+      flex-grow: 1
+      padding: .3rem
+    }
+
+    textarea {
+      min-height: 4rem
+    }
+
+    -choices {
+      max-width: 30rem
+
+      div.inputs {
+        display: flex
+        flex-wrap: wrap
+
+        input { 
+          flex-basis: 100%
+          padding: .3rem
+          margin-bottom: .5rem  
+        }
+      }
+    }
+
+    -closesAt {
+      justify-content: flex-end
+    }
+  }
+
+  div.publish {
+    display: flex
+    justify-content: flex-end
+
+    button { }
+  }
+}

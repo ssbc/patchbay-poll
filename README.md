@@ -9,5 +9,5 @@ $ npm i -g electro
 
 scripts for running test views in `/test`
 
-e.g. `electron test/pollCard.js`
+e.g. `electron test/com/poll-card.js`
 

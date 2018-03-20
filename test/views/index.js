@@ -2,7 +2,7 @@ const { h } = require('mutant')
 const pull = require('pull-stream')
 const Page = require('../../views/pollIndex')
 const { msg } = require('../mock-poll')
-require('../insertStyles')()
+require('../insert-styles')()
 
 const style = {
   'max-width': '40rem',

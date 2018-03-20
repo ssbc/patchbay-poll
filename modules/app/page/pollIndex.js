@@ -3,7 +3,7 @@ const nest = require('depnest')
 const ScuttlePoll = require('scuttle-poll')
 const isPoll = require('scuttle-poll/isPoll')
 const pull = require('pull-stream')
-const page = require('../../../views/pollIndex')
+const page = require('../../../views/index')
 
 exports.gives = nest({
   'app.html.menuItem': true,

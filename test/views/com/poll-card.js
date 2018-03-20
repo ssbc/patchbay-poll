@@ -1,8 +1,8 @@
 const { h } = require('mutant')
-const Card = require('../../../views/com/pollCard')
+const Card = require('../../../views/com/poll-card')
 const mdRenderer = require('../../simple-md')
 const { msg } = require('../../mock-poll')
-require('../../insertStyles')()
+require('../../insert-styles')()
 
 const style = {
   'max-width': '40rem',
