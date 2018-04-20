@@ -3,11 +3,7 @@ const { parsePoll } = require('ssb-poll-schema')
 const { h, Struct, map } = require('mutant')
 
 module.exports = function PollCard ({ msg, mdRenderer }) {
-  // const { title, body, closesAt } = parsePoll({ poll: msg })
-  // TODO reinstate this
-  const title = 'Do you want help converting your company to a coop?'
-  const body = 'coops are the way of the future, you can read more about them here'
-  const closesAt = new Date()
+  const { title, body, closesAt } = parsePoll(msg)
 
   const date = closesAt.toDateString()
   const [ _, time, zone ] = closesAt.toTimeString().match(/^(\d+:\d+).*(\(\w+\))$/)

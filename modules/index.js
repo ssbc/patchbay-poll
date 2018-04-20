@@ -18,6 +18,7 @@ const modules = {
     }
   },
   styles: {
+    css: require('./styles/css'),
     mcss: require('./styles/mcss')
   }
 }

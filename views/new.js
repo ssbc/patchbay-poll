@@ -1,38 +1,47 @@
 const { h, Struct, Array: MutantArray, Value, map, resolve } = require('mutant')
+const Pickr = require('flatpickr')
 
 module.exports = PollNew
 
-function PollNew ({ scuttlePoll }) {
-  const input = Struct({
+function PollNew ({ scuttlePoll, onPollPublished }) {
+  const poll = Struct({
     title: undefined,
     body: undefined,
-    choices: MutantArray([Value(), Value(), Value()])
+    choices: MutantArray([Value(), Value(), Value()]),
+    closesAt: undefined
   })
 
-  return h('PollNew -chooseOne', [
+  var picker
+  const timeInput = h('input', {
+    'ev-change': () => {
+      poll.closesAt.set(picker.input.value)
+    }
+  })
+
+  const page = h('PollNew -chooseOne', [
     h('h1', 'New Choose-one Poll'),
     h('div.field -title', [
       h('label', 'Title'),
-      h('input', { 'ev-input': ev => input.title.set(ev.target.value) }, input.title)
+      h('input', { 'ev-input': ev => poll.title.set(ev.target.value) }, poll.title)
     ]),
     h('div.field -body', [
       h('label', 'Description'),
-      h('textarea', { 'ev-input': ev => input.body.set(ev.target.value) }, input.body)
+      h('textarea', { 'ev-input': ev => poll.body.set(ev.target.value) }, poll.body)
     ]),
 
     h('div.field -choices', [
       h('label', 'Choices'),
       h('div.inputs', [
-        map(input.choices, (choice) => {
+        map(poll.choices, (choice) => {
           return h('input', { 'ev-input': ev => choice.set(ev.target.value) }, choice)
         }),
-        h('button', { 'ev-click': () => input.choices.push(Value()) }, '+ Add more')
+        h('button', { 'ev-click': () => poll.choices.push(Value()) }, '+ Add more')
       ])
     ]),
 
     h('div.field -closesAt', [
       h('label', 'Closes at'),
-      h('input', { 'ev-input': ev => input.body.set(ev.target.value) }, input.body)
+      timeInput
     ]),
 
     h('div.publish', [
@@ -40,9 +49,21 @@ function PollNew ({ scuttlePoll }) {
     ])
   ])
 
+  picker = new Pickr(timeInput, {
+    enableTime: true,
+    altInput: true,
+    altFormat: 'F j, Y h:i K',
+    dateFormat: 'Z'
+  })
+
+  return page
+
   function publish () {
-    const content = resolveInput(input)
-    scuttlePoll.poll.async.publishChooseOne(content)
+    const content = resolveInput(poll)
+    scuttlePoll.poll.async.publishChooseOne(content, (err, success) => {
+      if (err) return console.log(err) // put warnings on form
+      onPollPublished(success)
+    })
   }
 }
 

@@ -1,6 +1,6 @@
 const { h } = require('mutant')
 const pull = require('pull-stream')
-const Page = require('../../views/pollIndex')
+const Page = require('../../views/index')
 const { msg } = require('../mock-poll')
 require('../insert-styles')()
 
@@ -13,7 +13,10 @@ const container = h('div', { style }, [
     createPollStream: () => pull(
       pull.values([msg]),
       pull.through(console.log)
-    )
+    ),
+    showNewPoll: () => console.log('Opened new poll thing'),
+    openNewPage: () => console.log('Opened new page')
+
   })
 ])
 

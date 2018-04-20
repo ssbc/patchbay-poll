@@ -1,7 +1,7 @@
 const { h } = require('mutant')
 const nest = require('depnest')
 const ScuttlePoll = require('scuttle-poll')
-const isPoll = require('scuttle-poll/isPoll')
+const { isPoll } = require('ssb-poll-schema')
 const pull = require('pull-stream')
 const page = require('../../../views/index')
 

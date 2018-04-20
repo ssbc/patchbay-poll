@@ -1,4 +1,5 @@
 const { h } = require('mutant')
+const { isPoll } = require('ssb-poll-schema')
 require('../insert-styles')()
 
 const Page = require('../../views/new')
@@ -6,7 +7,17 @@ const Page = require('../../views/new')
 const scuttlePollMock = {
   poll: {
     async: {
-      publishChooseOne: console.log
+      publishChooseOne: (poll, cb) => {
+        poll.version = 'v1'
+
+        if (!isPoll(poll)) {
+          // return cb(isPoll.errors) // TODO fix ssb-poll-schema
+          console.error('invalid: ', poll)
+          return cb(new Error('have not created poll in database - the input data was not valid:'))
+        }
+        console.log('publishing poll:', poll)
+        cb(null, poll)
+      }
     }
   }
 }
@@ -18,7 +29,10 @@ const style = {
 
 const container = h('div', { style }, [
   Page({
-    scuttlePoll: scuttlePollMock
+    scuttlePoll: scuttlePollMock,
+    onPollPublished: (success) => {
+      console.log('poll successfully published', success)
+    }
   })
 ])
 
