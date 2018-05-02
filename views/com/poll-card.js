@@ -3,8 +3,9 @@ const { parsePoll } = require('ssb-poll-schema')
 const { h, Struct, map } = require('mutant')
 
 module.exports = function PollCard ({ msg, mdRenderer }) {
-  const { title, body, closesAt } = parsePoll(msg)
+  const { title, body, closesAt: closesAtString } = parsePoll(msg)
 
+  const closesAt = new Date(closesAtString)
   const date = closesAt.toDateString()
   const [ _, time, zone ] = closesAt.toTimeString().match(/^(\d+:\d+).*(\(\w+\))$/)
 
@@ -17,19 +18,18 @@ module.exports = function PollCard ({ msg, mdRenderer }) {
     ])
   ])
 
-    // h('div.choices', map(choices, choice => {
-    //   return h('button', choice)
-    //   // return h('button', { 'ev-click': publishPosition(choice, reason) }, choice)
-    // })),
-    // h('div.positions', map(positions, position => {
-    //   return h('pre.position', JSON.stringify(position.value.content, null, 2))
-    //   // name, position, reason
-    //   // e.g. mix "YES!", "it's a good idea"
-    //   // decorated position
-    //   // { key, value, author: @mix, choice: "YES", reason: "it's a good idea" }
-    // }))
+  // h('div.choices', map(choices, choice => {
+  //   return h('button', choice)
+  //   // return h('button', { 'ev-click': publishPosition(choice, reason) }, choice)
+  // })),
+  // h('div.positions', map(positions, position => {
+  //   return h('pre.position', JSON.stringify(position.value.content, null, 2))
+  //   // name, position, reason
+  //   // e.g. mix "YES!", "it's a good idea"
+  //   // decorated position
+  //   // { key, value, author: @mix, choice: "YES", reason: "it's a good idea" }
+  // }))
 }
-
 
 /// // LEFTOVERS vv
 // TODO - make the poll.obs.get to collapse all this !
@@ -37,7 +37,7 @@ function getPoll ({ msg, server }) {
   const { title, body, closesAt, pollDetails: { choices } } = msg.value.content
   console.log(msg)
 
-    // build an mutant obs
+  // build an mutant obs
   const poll = Struct({
     title,
     body,
