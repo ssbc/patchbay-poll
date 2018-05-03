@@ -27,6 +27,32 @@ PollShow {
 PollResults {
   margin: 1rem 0
 
+  div.choice {
+    min-height: 3rem
+    margin-bottom: 1rem
+
+    div.header {
+      font-weight: 600
+      span.count {
+        font-weight: 300
+        font-size: .8rem
+        margin-left: .5rem
+      }
+    }
+
+    div.positions {
+      color: #fff
+      font-family: monospace
+
+      display: flex
+      flex-wrap: wrap
+
+      div {
+        margin-right: .2rem
+      }
+    }
+  }
+
 }
 
 NewPosition {
@@ -78,4 +104,13 @@ NewPosition {
   }
 
   }
+}
+
+DefaultPollAvatar {
+  height: 4rem
+  width: 4rem
+
+  display: flex
+  justify-content: center
+  align-items: center
 }

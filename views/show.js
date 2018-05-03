@@ -3,8 +3,9 @@ const { parseChooseOnePoll } = require('ssb-poll-schema')
 
 module.exports = PollShow
 
-function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer }) {
+function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer, avatar }) {
   if (!mdRenderer) mdRenderer = (text) => text
+  if (!avatar) avatar = defaultAvatar
 
   const { title, body, closesAt: closesAtString, details: {choices} } = parseChooseOnePoll(msg)
   const closesAt = new Date(closesAtString)
@@ -34,20 +35,19 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer }) {
       ])
     ]),
     NewPosition({ choices }),
-    Results({ pollDoc })
+    Results({ pollDoc, avatar })
   ])
 
   return page
 
-  function Results ({ pollDoc }) {
+  function Results ({ pollDoc, avatar }) {
     return h('section.PollResults', map(pollDoc.results, result => {
-      console.log('r', result)
       return h('div.choice', [
-        h('div.header', result.choice),
-        h('div.positions', Object.keys(result.voters).map(id => {
-          console.log(result.voters[id])
-          return id
-        }))
+        h('div.header', [
+          result.choice,
+          h('span.count', computed(result.voters, vs => `(${Object.keys(vs).length})`))
+        ]),
+        h('div.positions', Object.keys(result.voters).map(avatar))
       ])
     }))
   }
@@ -96,3 +96,11 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer }) {
     }
   }
 }
+
+function defaultAvatar (feedId) {
+  return h('DefaultPollAvatar', { style: { 'background-color': `hsl(${Math.random()*360}, 40%, 40%)` } }, [
+    feedId.substr(0, 5),
+    '..'
+  ])
+}
+
