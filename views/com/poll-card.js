@@ -1,9 +1,9 @@
 // const ScuttlePoll = require('scuttle-poll')
-const { parsePoll } = require('ssb-poll-schema')
+const { parseChooseOnePoll } = require('ssb-poll-schema')
 const { h, Struct, map } = require('mutant')
 
 module.exports = function PollCard ({ msg, mdRenderer }) {
-  const { title, body, closesAt: closesAtString } = parsePoll(msg)
+  const { title, body, closesAt: closesAtString } = parseChooseOnePoll(msg)
 
   const closesAt = new Date(closesAtString)
   const date = closesAt.toDateString()
