@@ -1,4 +1,5 @@
 const { h } = require('mutant')
+require('../insert-styles')()
 
 var Server = require('scuttle-testbot')
 Server
@@ -11,26 +12,6 @@ const { content: mockContent } = require('../mock-poll')
 
 const Page = require('../../views/show')
 
-const scuttlePollMock = {
-  position: {
-    async: {
-      publishChooseOne: (position, cb) => {
-        buildChooseOne(position, function (err, postion) {
-          if (err) {
-            console.log(getPositionErrors(position))
-            // return cb(isPoll.errors) // TODO fix ssb-position-schema
-            console.error('invalid: ', position)
-            return cb(new Error('have not created position in database - the input data was not valid:'))
-          }
-          console.log('publishing position:', position)
-          cb(null, position)
-        })
-        // ({ poll, choice, reason, mentions }, cb) {
-      }
-    }
-  }
-}
-
 const style = {
   'max-width': '40rem',
   margin: '0 auto'
@@ -38,6 +19,10 @@ const style = {
 
 const opts = {
   title: mockContent.title,
+  body: `
+    I'm **really** keen on coops, and I think if more people had the opportunity to experience
+    the power of co-ownership, we'd have more dreamers.
+  `,
   choices: mockContent.details.choices,
   closesAt: mockContent.closesAt
 }

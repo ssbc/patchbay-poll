@@ -1,0 +1,81 @@
+PollShow {
+  section {
+    margin-bottom: 1rem
+  }
+
+  section.details {
+    h1 {
+    }
+
+    div.body {
+      margin-bottom: 1rem
+    }
+
+    div.closesAt {
+      div.label {
+        font-family: sans-serif
+        font-weight: 600
+
+        margin-right: .5rem
+      }
+    }
+  }
+
+}
+
+
+PollResults {
+  margin: 1rem 0
+
+}
+
+NewPosition {
+  background: hsl(0, 0%, 97%)
+  padding: 1rem
+  /* border: 1px gainsboro solid */
+  margin: 1rem 0
+
+  div.field {
+    display: flex
+    flex-wrap: wrap
+
+    * {
+      flex-basis: 100%
+    }
+
+    label {
+
+      font-family: sans-serif
+      font-weight: 600 
+    }
+
+    div.inputs {
+      div.choice {
+        background: #fff
+        padding: .5rem .7rem
+        border: 1px solid gainsboro
+        margin-bottom: .5rem
+
+        display: flex
+        align-items: center
+        
+        input {
+          margin-right: .5rem
+        }
+        label {}
+      }
+    }
+
+    textarea {
+      font-size: 1rem
+      font-family: serif
+      padding: .5rem
+
+      border-color: gainsboro
+    }
+
+    margin-bottom: .5rem
+  }
+
+  }
+}
