@@ -43,7 +43,6 @@ const opts = {
 }
 
 scuttlePoll.poll.async.publishChooseOne(opts, function (err, msg) {
-  console.log(msg)
   const container = h('div', { style }, [
     Page({
       msg,
