@@ -8,11 +8,8 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer }) {
 
   const { title, body, closesAt: closesAtString, details: {choices} } = parseChooseOnePoll(msg)
   const closesAt = new Date(closesAtString)
+
   const poll = Struct({
-    title,
-    body,
-    choices: MutantArray(choices.map((choice, index) => Struct({choice, index}))),
-    closesAt: closesAt,
     choice: Value(0),
     reason: Value('')
   })
@@ -21,20 +18,20 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer }) {
   const [ _, time, zone ] = closesAt.toTimeString().match(/^(\d+:\d+).*(\(\w+\))$/)
 
   const page = h('PollShow -chooseOne', [
-    h('h1', poll.title),
+    h('h1', title),
     h('div.closesAt', [
       'closes at: ',
       `${time},  ${date} ${zone}`
     ]),
 
-    h('div.body', mdRenderer(msg.body)),
+    h('div.body', mdRenderer(body)),
     h('div.field -choices', [
       h('label', 'Choices'),
       h('div.inputs', [
-        map(poll.choices, ({choice, index}) => {
-          var id = `choice-${index()}`
+        choices.map((choice, index) => {
+          var id = `choice-${index}`
           return h('div.choice', [
-            h('input', { type: 'radio', 'ev-change': ev => { poll.choice.set(index()) }, id, name: 'choices' }),
+            h('input', { type: 'radio', 'ev-change': ev => { poll.choice.set(index) }, id, name: 'choices' }),
             h('label', { for: id }, choice)
           ])
         })
