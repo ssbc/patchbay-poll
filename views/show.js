@@ -1,4 +1,4 @@
-const { h, Struct, Array: MutantArray, Value, map, resolve } = require('mutant')
+const { h, Struct, Value, resolve } = require('mutant')
 const { parseChooseOnePoll } = require('ssb-poll-schema')
 
 module.exports = PollShow
@@ -51,8 +51,8 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer }) {
 
   function publish () {
     const content = {
-      choice: poll.choice(),
-      poll: Object.assign({key: msg.key}, parseChooseOnePoll(msg)),
+      poll: parseChooseOnePoll(msg),
+      choice: resolve(poll.choice),
       reason: resolve(poll.reason)
     }
     scuttlePoll.position.async.publishChooseOne(content, (err, success) => {
