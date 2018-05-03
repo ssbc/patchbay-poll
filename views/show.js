@@ -1,19 +1,20 @@
 const { h, Struct, Array: MutantArray, Value, map, resolve } = require('mutant')
-const { parsePoll } = require('ssb-poll-schema')
+const { parseChooseOnePoll } = require('ssb-poll-schema')
 
 module.exports = PollShow
 
 function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer }) {
   if (!mdRenderer) mdRenderer = (text) => text
 
-  const { title, body, closesAt: closesAtString, details: {choices} } = parsePoll(msg)
+  const { title, body, closesAt: closesAtString, details: {choices} } = parseChooseOnePoll(msg)
   const closesAt = new Date(closesAtString)
   const poll = Struct({
     title,
     body,
     choices: MutantArray(choices.map((choice, index) => Struct({choice, index}))),
     closesAt: closesAt,
-    choice: Value(0)
+    choice: Value(0),
+    reason: Value('')
   })
 
   const date = closesAt.toDateString()
@@ -39,6 +40,10 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer }) {
         })
       ])
     ]),
+    h('div.field -reason', [
+      h('label', 'Reason'),
+      h('textarea', { 'ev-input': ev => poll.reason.set(ev.target.value) }, poll.reason)
+    ]),
 
     h('div.publish', [
       h('button', { 'ev-click': publish }, 'Go!')
@@ -50,8 +55,8 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer }) {
   function publish () {
     const content = {
       choice: poll.choice(),
-      poll: parsePoll(msg),
-      reason: 'reasons'
+      poll: Object.assign({key: msg.key}, parseChooseOnePoll(msg)),
+      reason: resolve(poll.reason)
     }
     scuttlePoll.position.async.publishChooseOne(content, (err, success) => {
       if (err) return console.log(err) // put warnings on form
