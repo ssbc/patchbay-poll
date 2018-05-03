@@ -7,7 +7,7 @@ Server
 // const {position: {async: {buildChooseOne}}} = require('scuttle-poll')(Server())
 const scuttlePoll = require('scuttle-poll')(Server())
 const { isPosition, getPositionErrors } = require('ssb-poll-schema')
-const { msg } = require('../mock-poll')
+const { content: mockContent } = require('../mock-poll')
 
 const Page = require('../../views/show')
 
@@ -37,13 +37,13 @@ const style = {
 }
 
 const opts = {
-  title: msg.title,
-  choices: msg.choices,
-  closesAt: msg.closesAt
+  title: mockContent.title,
+  choices: mockContent.details.choices,
+  closesAt: mockContent.closesAt
 }
 
-scuttlePoll.poll.async.publishChooseOne(opts, function (err, res) {
-  console.log(err)
+scuttlePoll.poll.async.publishChooseOne(opts, function (err, msg) {
+  console.log(msg)
   const container = h('div', { style }, [
     Page({
       msg,
