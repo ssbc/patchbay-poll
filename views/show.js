@@ -1,4 +1,4 @@
-const { h, Struct, Value, resolve } = require('mutant')
+const { h, Struct, Value, resolve, computed } = require('mutant')
 const { parseChooseOnePoll } = require('ssb-poll-schema')
 
 module.exports = PollShow
@@ -30,8 +30,8 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer }) {
       h('div.inputs', [
         choices.map((choice, index) => {
           var id = `choice-${index}`
-          return h('div.choice', [
-            h('input', { type: 'radio', 'ev-change': ev => { poll.choice.set(index) }, id, name: 'choices' }),
+          return h('div.choice', {'ev-click': ev => { poll.choice.set(index) }}, [
+            h('input', { type: 'radio', checked: computed(poll.choice, c => c === index), id, name: 'choices'}),
             h('label', { for: id }, choice)
           ])
         })
