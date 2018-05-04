@@ -1,5 +1,6 @@
 PollCard {
   padding: 1rem
+  cursor: pointer
 
   border: 1px solid gainsboro
   margin-bottom: 1rem

@@ -5,7 +5,7 @@ const next = require('pull-next-step')
 
 const PollCard = require('./com/poll-card')
 
-module.exports = function pollIndex ({ createPollStream, mdRenderer, showNewPoll }) {
+module.exports = function pollIndex ({ createPollStream, mdRenderer, showPoll, showNewPoll }) {
   if (!mdRenderer) mdRenderer = (text) => text
 
   var viewMode = Value('future')
@@ -50,7 +50,9 @@ module.exports = function pollIndex ({ createPollStream, mdRenderer, showNewPoll
             const { closesAt } = parseChooseOnePoll(msg)
 
             if (new Date(closesAt) < new Date()) return// TODO figure out nice way to make this update
-            return PollCard({ msg, mdRenderer })
+
+            const onClick = () => showPoll(msg)
+            return PollCard({ msg, mdRenderer, onClick })
           }
         }))
 

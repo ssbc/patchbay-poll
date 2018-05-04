@@ -38,8 +38,8 @@ scuttlePoll.poll.async.publishChooseOne(opts, function (err, msg) {
         Page({
           msg,
           scuttlePoll: scuttlePoll,
-          onPollPublished: (success) => {
-            console.log('poll successfully published', success)
+          onPositionPublished: (success) => {
+            console.log('position successfully published', success)
           }
         })
       ])

@@ -2,14 +2,14 @@
 const { parseChooseOnePoll } = require('ssb-poll-schema')
 const { h, Struct, map } = require('mutant')
 
-module.exports = function PollCard ({ msg, mdRenderer }) {
+module.exports = function PollCard ({ msg, mdRenderer, onClick }) {
   const { title, body, closesAt: closesAtString } = parseChooseOnePoll(msg)
 
   const closesAt = new Date(closesAtString)
   const date = closesAt.toDateString()
   const [ _, time, zone ] = closesAt.toTimeString().match(/^(\d+:\d+).*(\(\w+\))$/)
 
-  return h('PollCard', { className: 'Markdown' }, [
+  return h('PollCard', { className: 'Markdown', 'ev-click': onClick }, [
     h('h1', title),
     h('div.body', mdRenderer(body)),
     h('div.closesAt', [

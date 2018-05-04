@@ -1,9 +1,11 @@
 const nest = require('depnest')
+const { isPoll } = require('ssb-poll-schema')
 
 exports.gives = nest('router.sync.routes')
 
 exports.needs = nest({
-  'app.page.pollIndex': 'first'
+  'app.page.pollIndex': 'first',
+  'app.page.pollShow': 'first'
 })
 
 exports.create = (api) => {
@@ -12,7 +14,8 @@ exports.create = (api) => {
 
     // loc = location
     const routes = [
-      [ loc => loc.page === 'polls', pages.pollIndex ]
+      [ loc => loc.page === 'polls', pages.pollIndex ],
+      [ loc => isPoll(loc), pages.pollShow ]
     ]
 
     return [...routes, ...sofar]

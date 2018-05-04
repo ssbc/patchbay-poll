@@ -13,6 +13,7 @@ exports.gives = nest({
 
 exports.needs = nest({
   'app.html.modal': 'first',
+  'app.sync.goTo': 'first',
   'feed.pull.type': 'first',
   'message.html.markdown': 'first',
   'sbot.obs.connection': 'first'
@@ -35,7 +36,10 @@ exports.create = function (api) {
     const newPoll = api.app.html.modal(
       PollNew({
         scuttlePoll: ScuttlePoll(api.sbot.obs.connection),
-        onPollPublished: () => newPoll.close()
+        onPollPublished: (success) => {
+          console.log('onPollPublished', success)
+          newPoll.close()
+        }
       })
     )
 
@@ -45,6 +49,7 @@ exports.create = function (api) {
         pull.filter(isPoll)
       ),
       mdRenderer: api.message.html.markdown,
+      showPoll: api.app.sync.goTo,
       showNewPoll: () => newPoll.open()
     })
 

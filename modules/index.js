@@ -1,7 +1,8 @@
 const modules = {
   app: {
     page: {
-      pollIndex: require('./app/page/pollIndex')
+      pollIndex: require('./app/page/pollIndex'),
+      pollShow: require('./app/page/pollShow')
     }
   },
   // message: {

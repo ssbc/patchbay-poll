@@ -3,7 +3,7 @@ const { parseChooseOnePoll } = require('ssb-poll-schema')
 
 module.exports = PollShow
 
-function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer, avatar, timeago, name }) {
+function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, timeago, name }) {
   if (!mdRenderer) mdRenderer = (text) => text
   if (!avatar) avatar = defaultAvatar
   if (!timeago) timeago = defaultTimeago
@@ -120,7 +120,7 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer, avatar, time
       }
       scuttlePoll.position.async.publishChooseOne(content, (err, success) => {
         if (err) return console.log(err) // put warnings on form
-        onPollPublished(success)
+        onPositionPublished(success)
         // TODO - check if this should be here...
         updatePollDoc()
       })
