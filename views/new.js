@@ -50,7 +50,6 @@ function PollNew ({ scuttlePoll, onPollPublished, onCancel }) {
     ])
   ])
 
-  // TODO handle flatpickr being added to the DOM multiple times D:
   const Pickr = require('flatpickr')
   picker = new Pickr(timeInput, {
     enableTime: true,
@@ -59,7 +58,7 @@ function PollNew ({ scuttlePoll, onPollPublished, onCancel }) {
     dateFormat: 'Z'
   })
 
-  page.cancel = cancel
+  page.cancel = cancel // made available for manual garbage collection of flatpicker
   return page
 
   function cancel () {
