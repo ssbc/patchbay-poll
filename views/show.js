@@ -3,9 +3,10 @@ const { parseChooseOnePoll } = require('ssb-poll-schema')
 
 module.exports = PollShow
 
-function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer, avatar }) {
+function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer, avatar, name }) {
   if (!mdRenderer) mdRenderer = (text) => text
   if (!avatar) avatar = defaultAvatar
+  if (!name) name = defaultName
 
   const { title, body, closesAt: closesAtString, details: {choices} } = parseChooseOnePoll(msg)
   const closesAt = new Date(closesAtString)
@@ -35,10 +36,34 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer, avatar }) {
       ])
     ]),
     NewPosition({ choices }),
-    Results({ pollDoc, avatar })
+    Results({ pollDoc, avatar }),
+    Positions({ pollDoc, avatar, name })
   ])
 
   return page
+
+  function Positions ({ pollDoc, avatar, name }) {
+    return h('section.PollPositions', [
+      h('div.heading', ['History']),
+      h('div.positions', map(pollDoc.positions, position => {
+        const {author, timestamp} = position.value
+        // postion, reason, time, avatar, name
+        return h('div.position', [
+          h('div.left', [
+            h('div.avatar', avatar(author)),
+            h('div.timestamp', timestamp)
+          ]),
+          h('div.right', [
+            h('div.summary', [
+              h('div.name', name(author)),
+              h('div.choice', position.choice)
+            ]),
+            h('div.reason', position.reason)
+          ])
+        ])
+      }))
+    ])
+  }
 
   function Results ({ pollDoc, avatar }) {
     return h('section.PollResults', map(pollDoc.results, result => {
@@ -98,9 +123,14 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer, avatar }) {
 }
 
 function defaultAvatar (feedId) {
-  return h('DefaultPollAvatar', { style: { 'background-color': `hsl(${Math.random()*360}, 40%, 40%)` } }, [
+  return h('DefaultPollAvatar', { style: { 'background-color': `hsl(${Math.random() * 360}, 40%, 40%)` } }, [
     feedId.substr(0, 5),
     '..'
   ])
 }
-
+function defaultName (feedId) {
+  return h('DefaultPollName', [
+    feedId.substr(0, 5),
+    '..'
+  ])
+}

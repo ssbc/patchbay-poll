@@ -23,6 +23,32 @@ PollShow {
 
 }
 
+PollPositions {
+
+  div.positions {
+
+    div.position {
+
+      display: flex
+      div.left {
+        order: 0
+        flex-basis: 6rem
+      }
+
+      div.right {
+        order: 1
+        flex-grow: 1
+        
+        div.summary {
+          display: flex 
+          div.name {
+          
+          }
+        }
+      }
+    }
+  }
+}
 
 PollResults {
   margin: 1rem 0
