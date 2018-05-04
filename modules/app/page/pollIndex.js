@@ -1,9 +1,10 @@
-const { h } = require('mutant')
+const { h, Value } = require('mutant')
 const nest = require('depnest')
 const ScuttlePoll = require('scuttle-poll')
 const { isPoll } = require('ssb-poll-schema')
 const pull = require('pull-stream')
-const page = require('../../../views/index')
+const PollIndex = require('../../../views/index')
+const PollNew = require('../../../views/new')
 
 exports.gives = nest({
   'app.html.menuItem': true,
@@ -11,14 +12,16 @@ exports.gives = nest({
 })
 
 exports.needs = nest({
+  'app.html.modal': 'first',
   'feed.pull.type': 'first',
+  'message.html.markdown': 'first',
   'sbot.obs.connection': 'first'
 })
 
 exports.create = function (api) {
   return nest({
     'app.html.menuItem': menuItem,
-    'app.page.pollIndex': pollIndex
+    'app.page.pollIndex': pollIndexPage
   })
 
   function menuItem (handleClick) {
@@ -28,14 +31,25 @@ exports.create = function (api) {
     }, '/polls')
   }
 
-  function pollIndex (path) {
-    return page({
-      scuttlePoll: ScuttlePoll(api.sbot.obs.connection),
+  function pollIndexPage (path) {
+    const newPoll = api.app.html.modal(
+      PollNew({
+        scuttlePoll: ScuttlePoll(api.sbot.obs.connection),
+        onPollPublished: () => newPoll.close()
+      })
+    )
+
+    const indexPage = PollIndex({
       createPollStream: (opts) => pull(
         api.feed.pull.type('poll')(opts), // TODO update patchcore
-        pull.through(console.log),
         pull.filter(isPoll)
-      )
+      ),
+      mdRenderer: api.message.html.markdown,
+      showNewPoll: () => newPoll.open()
     })
+
+    indexPage.appendChild(newPoll)
+
+    return indexPage
   }
 }

@@ -7,7 +7,6 @@ const PollCard = require('./com/poll-card')
 
 module.exports = function pollIndex ({ createPollStream, mdRenderer, showNewPoll }) {
   if (!mdRenderer) mdRenderer = (text) => text
-  // TODO wire up mdRenderer (inject or require?)
 
   var viewMode = Value('future')
   var page = createPage('future')

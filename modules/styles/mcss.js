@@ -20,6 +20,7 @@ exports.create = function (api) {
       const name = basename(filename)
       sofar[name] = content
     })
+
     return sofar
   }
 }
