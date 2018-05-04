@@ -33,16 +33,6 @@ exports.create = function (api) {
   }
 
   function pollIndexPage (path) {
-    const newPoll = api.app.html.modal(
-      PollNew({
-        scuttlePoll: ScuttlePoll(api.sbot.obs.connection),
-        onPollPublished: (success) => {
-          console.log('onPollPublished', success)
-          newPoll.close()
-        }
-      })
-    )
-
     const indexPage = PollIndex({
       createPollStream: (opts) => pull(
         api.feed.pull.type('poll')(opts), // TODO update patchcore
@@ -50,11 +40,22 @@ exports.create = function (api) {
       ),
       mdRenderer: api.message.html.markdown,
       showPoll: api.app.sync.goTo,
-      showNewPoll: () => newPoll.open()
+      showNewPoll
     })
 
-    indexPage.appendChild(newPoll)
-
     return indexPage
+
+    function showNewPoll () {
+      const newPoll = PollNew({
+        scuttlePoll: ScuttlePoll(api.sbot.obs.connection),
+        onPollPublished: (success) => {
+          console.log('onPollPublished', success)
+          modal.close()
+        }
+      })
+      const modal = api.app.html.modal(newPoll, { onClose: () => newPoll.cancel() })
+      indexPage.appendChild(modal)
+      modal.open()
+    }
   }
 }

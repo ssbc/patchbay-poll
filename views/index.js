@@ -8,23 +8,24 @@ const PollCard = require('./com/poll-card')
 module.exports = function pollIndex ({ createPollStream, mdRenderer, showPoll, showNewPoll }) {
   if (!mdRenderer) mdRenderer = (text) => text
 
-  var viewMode = Value('future')
+  // var viewMode = Value('future')
   var page = createPage('future')
 
   // this doesn't work
-  viewMode(updateToMode)
-  function updateToMode (mode) {
-    console.log(mode)
-    const parentEl = page.parentElement
-    if (!parentEl) {
-      console.log('not there yet!')
-      setTimeout(() => updateToMode(mode), 200)
-      return
-    }
-    parentEl.removeChild(page)
-    parentEl.appendChild(createPage(mode))
-  }
+  // viewMode(updateToMode)
+  // function updateToMode (mode) {
+  //   console.log(mode)
+  //   const parentEl = page.parentElement
+  //   if (!parentEl) {
+  //     console.log('not there yet!')
+  //     setTimeout(() => updateToMode(mode), 200)
+  //     return
+  //   }
+  //   parentEl.removeChild(page)
+  //   parentEl.appendChild(createPage(mode))
+  // }
 
+  page.title = '/polls'
   return page
 
   function createPage (mode) {

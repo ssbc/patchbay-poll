@@ -1,9 +1,9 @@
 const { h, Struct, Array: MutantArray, Value, map, resolve } = require('mutant')
-const Pickr = require('flatpickr')
+// 'flatpickr' is also required, but done further down because it adds itself to the DOM on require D:
 
 module.exports = PollNew
 
-function PollNew ({ scuttlePoll, onPollPublished }) {
+function PollNew ({ scuttlePoll, onPollPublished, onCancel }) {
   const poll = Struct({
     title: undefined,
     body: undefined,
@@ -44,11 +44,14 @@ function PollNew ({ scuttlePoll, onPollPublished }) {
       timeInput
     ]),
 
-    h('div.publish', [
+    h('div.actions', [
+      h('button', { 'ev-click': cancel }, 'Cancel'),
       h('button', { 'ev-click': publish }, 'Start Poll')
     ])
   ])
 
+  // TODO handle flatpickr being added to the DOM multiple times D:
+  const Pickr = require('flatpickr')
   picker = new Pickr(timeInput, {
     enableTime: true,
     altInput: true,
@@ -56,7 +59,13 @@ function PollNew ({ scuttlePoll, onPollPublished }) {
     dateFormat: 'Z'
   })
 
+  page.cancel = cancel
   return page
+
+  function cancel () {
+    picker && picker.destroy && picker.destroy()
+    onCancel && onCancel()
+  }
 
   function publish () {
     const content = resolveInput(poll)

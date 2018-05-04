@@ -44,10 +44,11 @@ PollNew -chooseOne {
     }
   }
 
-  div.publish {
+  div.actions {
     display: flex
     justify-content: flex-end
 
-    button { }
+    button.cancel { }
+    button.publish { }
   }
 }
