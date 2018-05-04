@@ -25,26 +25,31 @@ PollShow {
 
 PollPositions {
 
-  div.positions {
+  div.PollPosition {
 
-    div.position {
+  }
+}
+PollPosition {
 
-      display: flex
-      div.left {
-        order: 0
-        flex-basis: 6rem
-      }
+  display: flex
+  div.left {
+    order: 0
+    flex-basis: 6rem
 
-      div.right {
-        order: 1
-        flex-grow: 1
-        
-        div.summary {
-          display: flex 
-          div.name {
-          
-          }
-        }
+    div.timestamp {
+      color: hsl(0, 0%, 40%)
+      font-size: 0.8rem
+    }
+  }
+
+  div.right {
+    order: 1
+    flex-grow: 1
+    
+    div.summary {
+      display: flex 
+      div.name {
+      
       }
     }
   }
@@ -67,9 +72,6 @@ PollResults {
     }
 
     div.positions {
-      color: #fff
-      font-family: monospace
-
       display: flex
       flex-wrap: wrap
 
@@ -135,6 +137,9 @@ NewPosition {
 DefaultPollAvatar {
   height: 4rem
   width: 4rem
+
+  color: #fff
+  font-family: monospace
 
   display: flex
   justify-content: center

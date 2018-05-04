@@ -3,9 +3,10 @@ const { parseChooseOnePoll } = require('ssb-poll-schema')
 
 module.exports = PollShow
 
-function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer, avatar, name }) {
+function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer, avatar, timeago, name }) {
   if (!mdRenderer) mdRenderer = (text) => text
   if (!avatar) avatar = defaultAvatar
+  if (!timeago) timeago = defaultTimeago
   if (!name) name = defaultName
 
   const { title, body, closesAt: closesAtString, details: {choices} } = parseChooseOnePoll(msg)
@@ -37,21 +38,21 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer, avatar, name
     ]),
     NewPosition({ choices }),
     Results({ pollDoc, avatar }),
-    Positions({ pollDoc, avatar, name })
+    Positions({ pollDoc, avatar, timeago, name })
   ])
 
   return page
 
-  function Positions ({ pollDoc, avatar, name }) {
+  function Positions ({ pollDoc, avatar, timeago, name }) {
     return h('section.PollPositions', [
       h('div.heading', ['History']),
       h('div.positions', map(pollDoc.positions, position => {
         const {author, timestamp} = position.value
         // postion, reason, time, avatar, name
-        return h('div.position', [
+        return h('PollPosition', [
           h('div.left', [
             h('div.avatar', avatar(author)),
-            h('div.timestamp', timestamp)
+            h('div.timestamp', timeago(timestamp))
           ]),
           h('div.right', [
             h('div.summary', [
@@ -85,7 +86,7 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer, avatar, name
 
     return h('section.NewPosition', [
       h('div.field -choices', [
-        h('label', 'Choices'),
+        h('label', 'Choose One'),
         h('div.inputs', [
           choices.map((choice, index) => {
             var id = `choice-${index}`
@@ -128,6 +129,11 @@ function defaultAvatar (feedId) {
     '..'
   ])
 }
+
+function defaultTimeago (time) {
+  return new Date(time).toISOString().substr(0, 10)
+}
+
 function defaultName (feedId) {
   return h('DefaultPollName', [
     feedId.substr(0, 5),
