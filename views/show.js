@@ -1,4 +1,4 @@
-const { h, Struct, Value, resolve, computed, map } = require('mutant')
+const { h, Struct, Value, resolve, computed, map, when } = require('mutant')
 const { parseChooseOnePoll } = require('ssb-poll-schema')
 
 module.exports = PollShow
@@ -45,7 +45,7 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer, avatar, time
 
   function Positions ({ pollDoc, avatar, timeago, name }) {
     return h('section.PollPositions', [
-      h('div.heading', ['History']),
+      h('h2', ['History']),
       h('div.positions', map(pollDoc.positions, position => {
         const {author, timestamp} = position.value
         // postion, reason, time, avatar, name
@@ -57,6 +57,7 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer, avatar, time
           h('div.right', [
             h('div.summary', [
               h('div.name', name(author)),
+              '-',
               h('div.choice', position.choice)
             ]),
             h('div.reason', position.reason)
@@ -67,15 +68,19 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer, avatar, time
   }
 
   function Results ({ pollDoc, avatar }) {
-    return h('section.PollResults', map(pollDoc.results, result => {
-      return h('div.choice', [
-        h('div.header', [
-          result.choice,
-          h('span.count', computed(result.voters, vs => `(${Object.keys(vs).length})`))
-        ]),
-        h('div.positions', Object.keys(result.voters).map(avatar))
-      ])
-    }))
+    return h('section.PollResults', [
+      h('h2', 'Current Results'),
+      h('div.choices', map(pollDoc.results, result => {
+        const count = computed(result.voters, vs => Object.keys(vs).length)
+        return when(count, h('div.choice', [
+          h('div.header', [
+            result.choice,
+            h('span.count', ['(', count, ')'])
+          ]),
+          h('div.positions', Object.keys(result.voters).map(avatar))
+        ]))
+      }))
+    ])
   }
 
   function NewPosition ({ choices }) {
@@ -103,7 +108,7 @@ function PollShow ({ msg, scuttlePoll, onPollPublished, mdRenderer, avatar, time
       ]),
 
       h('div.publish', [
-        h('button', { 'ev-click': publish }, 'Go!')
+        h('button', { 'ev-click': publish }, 'Publish position')
       ])
     ])
 
