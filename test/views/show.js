@@ -5,8 +5,11 @@ var Server = require('scuttle-testbot')
 Server
   .use(require('ssb-backlinks'))
 
+const server = Server()
+
+const otherFeed = server.createFeed()
 // const {position: {async: {buildChooseOne}}} = require('scuttle-poll')(Server())
-const scuttlePoll = require('scuttle-poll')(Server())
+const scuttlePoll = require('scuttle-poll')(server)
 const { isPosition, getPositionErrors } = require('ssb-poll-schema')
 const { content: mockContent } = require('../mock-poll')
 
@@ -28,15 +31,19 @@ const opts = {
 }
 
 scuttlePoll.poll.async.publishChooseOne(opts, function (err, msg) {
-  const container = h('div', { style }, [
-    Page({
-      msg,
-      scuttlePoll: scuttlePoll,
-      onPollPublished: (success) => {
-        console.log('poll successfully published', success)
-      }
-    })
-  ])
+  const buildChooseOne = scuttlePoll.position.async.buildChooseOne
+  buildChooseOne({poll: msg, choice: 0, reason: 'This is the bestest idea you have ever had hermano!!!'}, function (err, newPosition) {
+    otherFeed.publish(newPosition, console.log)
+    const container = h('div', { style }, [
+      Page({
+        msg,
+        scuttlePoll: scuttlePoll,
+        onPollPublished: (success) => {
+          console.log('poll successfully published', success)
+        }
+      })
+    ])
 
-  document.body.appendChild(container)
+    document.body.appendChild(container)
+  })
 })
