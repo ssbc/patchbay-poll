@@ -16,8 +16,8 @@ const { content: mockContent } = require('../mock-poll')
 const Page = require('../../views/show')
 
 const style = {
-  'max-width': '40rem',
-  margin: '0 auto'
+  // 'max-width': '40rem',
+  // margin: '0 auto'
 }
 
 const opts = {
