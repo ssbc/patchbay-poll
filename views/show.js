@@ -24,12 +24,6 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
     })
   }
 
-  const forceShowNewPosition = Value(false)
-  const showNewPosition = computed([pollDoc.myPosition, forceShowNewPosition], (myPosition, force) => {
-    if (force) return true
-    return !Boolean(myPosition)
-  })
-
   const forceShowProgress = Value(false)
   const showProgress = computed([pollDoc.myPosition, forceShowProgress], (myPosition, force) => {
     if (force) return true
@@ -45,18 +39,14 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
         printClosesAt(closesAt)
       ])
     ]),
-    when(showNewPosition,
-      NewPosition({ choices }),
-      h('a', 
-        {
-          href: '#',
-          'ev-click': ev => {
-            ev.stopPropagation()
-            forceShowNewPosition.set(true)
-          } 
-        },
-        'Change your position')
-    ),
+    NewPosition({
+      choices,
+      currentPosition: pollDoc.myPosition,
+      onPublish: (success) => {
+        onPositionPublished(success)
+        updatePollDoc()
+      }
+    }),
     when(showProgress, [
       Results({ pollDoc, avatar }),
       Positions({ pollDoc, avatar, timeago, name })
@@ -105,33 +95,42 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
     ])
   }
 
-  function NewPosition ({ choices }) {
+  function NewPosition ({ choices, currentPosition, onPublish }) {
     const newPosition = Struct({
       choice: Value(),
       reason: Value('')
     })
 
-    return h('section.NewPosition', [
+    const forceShow = Value(false)
+    forceShow(console.log)
+
+    const className = computed([pollDoc.myPosition, forceShow], (myPosition, force) => {
+      if (force) return '-show'
+      return !myPosition ? '-show' : '-hidden'
+    })
+
+    return h('section.NewPosition', { className }, [
       h('div.field -choices', [
         h('label', 'Choose One'),
-        h('div.inputs', [
-          choices.map((choice, index) => {
-            var id = `choice-${index}`
-            return h('div.choice', {'ev-click': ev => { newPosition.choice.set(index) }}, [
-              h('input', { type: 'radio', checked: computed(newPosition.choice, c => c === index), id, name: 'choices' }),
-              h('label', { for: id }, choice)
-            ])
-          })
-        ])
+        h('div.inputs', choices.map((choice, index) => {
+          var id = `choice-${index}`
+          return h('div.choice', {'ev-click': ev => { newPosition.choice.set(index) }}, [
+            h('input', { type: 'radio', checked: computed(newPosition.choice, c => c === index), id, name: 'choices' }),
+            h('label', { for: id }, choice)
+          ])
+        })
+        )
       ]),
       h('div.field -reason', [
         h('label', 'Reason'),
         h('textarea', { 'ev-input': ev => newPosition.reason.set(ev.target.value) }, newPosition.reason)
       ]),
-
-      h('div.publish', [
-        h('button', { 'ev-click': publish }, 'Publish position')
-      ])
+      h('div.actions', [
+        h('button.publish.-primary', { 'ev-click': publish }, 'Publish position')
+      ]),
+      h('div.changePosition', { 'ev-click': ev => forceShow.set(true) },
+        'Change your position'
+      )
     ])
 
     function publish () {
@@ -143,9 +142,8 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
       scuttlePoll.position.async.publishChooseOne(content, (err, success) => {
         if (err) return console.log(err) // put warnings on form
 
-        onPositionPublished(success)
-        updatePollDoc()
-        forceShowNewPosition.set(false)
+        onPublish(success)
+        forceShow.set(false)
       })
     }
   }
