@@ -13,7 +13,7 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
   const closesAt = new Date(closesAtString)
 
   // TODO use parseChooseOnePoll or scuttlePoll
-  const pollDoc = Struct({ results: [], positions: [] })
+  const pollDoc = Struct({ results: [], positions: [], myPosition: null})
   updatePollDoc()
 
   function updatePollDoc () {
@@ -24,8 +24,17 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
     })
   }
 
-  const date = closesAt.toDateString()
-  const [ _, time, zone ] = closesAt.toTimeString().match(/^(\d+:\d+).*(\(\w+\))$/)
+  const forceShowNewPosition = Value(false)
+  const showNewPosition = computed([pollDoc.myPosition, forceShowNewPosition], (myPosition, force) => {
+    if (force) return true
+    return !Boolean(myPosition)
+  })
+
+  const forceShowProgress = Value(false)
+  const showProgress = computed([pollDoc.myPosition, forceShowProgress], (myPosition, force) => {
+    if (force) return true
+    return Boolean(myPosition)
+  })
 
   const page = h('PollShow -chooseOne', [
     h('section.details', [
@@ -33,12 +42,25 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
       h('div.body', mdRenderer(body)),
       h('div.closesAt', [
         h('div.label', 'Closes at'),
-        `${time},  ${date} ${zone}`
+        printClosesAt(closesAt)
       ])
     ]),
-    NewPosition({ choices }),
-    Results({ pollDoc, avatar }),
-    Positions({ pollDoc, avatar, timeago, name })
+    when(showNewPosition,
+      NewPosition({ choices }),
+      h('a', 
+        {
+          href: '#',
+          'ev-click': ev => {
+            ev.stopPropagation()
+            forceShowNewPosition.set(true)
+          } 
+        },
+        'Change your position')
+    ),
+    when(showProgress, [
+      Results({ pollDoc, avatar }),
+      Positions({ pollDoc, avatar, timeago, name })
+    ])
   ])
 
   return page
@@ -85,7 +107,7 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
 
   function NewPosition ({ choices }) {
     const newPosition = Struct({
-      choice: Value(0),
+      choice: Value(),
       reason: Value('')
     })
 
@@ -120,9 +142,10 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
       }
       scuttlePoll.position.async.publishChooseOne(content, (err, success) => {
         if (err) return console.log(err) // put warnings on form
+
         onPositionPublished(success)
-        // TODO - check if this should be here...
         updatePollDoc()
+        forceShowNewPosition.set(false)
       })
     }
   }
@@ -144,4 +167,10 @@ function defaultName (feedId) {
     feedId.substr(0, 5),
     '..'
   ])
+}
+
+function printClosesAt (dateTime) {
+  const date = dateTime.toDateString()
+  const [ _, time, zone ] = dateTime.toTimeString().match(/^(\d+:\d+).*(\(\w+\))$/)
+  return `${time}, ${date} ${zone}`
 }

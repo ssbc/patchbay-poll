@@ -7,13 +7,13 @@ exports.gives = nest({
 })
 
 exports.needs = nest({
+  'about.obs.name': 'first',
   'app.html.modal': 'first',
   'app.sync.goTo': 'first',
   'feed.pull.type': 'first',
   'about.html.avatar': 'first',
   'lib.obs.timeAgo': 'first',
   'message.html.markdown': 'first',
-  'message.obs.name': 'first',
   'sbot.obs.connection': 'first'
 })
 
@@ -32,7 +32,7 @@ exports.create = function (api) {
       mdRenderer: api.message.html.markdown,
       avatar: api.about.html.avatar,
       timeago: api.lib.obs.timeAgo,
-      name: api.message.obs.name
+      name: api.about.obs.name
     })
   }
 }
