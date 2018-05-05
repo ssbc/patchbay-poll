@@ -13,7 +13,8 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
   const closesAt = new Date(closesAtString)
 
   // TODO use parseChooseOnePoll or scuttlePoll
-  const pollDoc = Struct({ results: [], positions: [], myPosition: null})
+  const pollDoc = Struct({ results: [], positions: [], myPosition: false })
+  pollDoc(console.log)
   updatePollDoc()
 
   function updatePollDoc () {
@@ -23,12 +24,6 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
       pollDoc.set(data)
     })
   }
-
-  const forceShowProgress = Value(false)
-  const showProgress = computed([pollDoc.myPosition, forceShowProgress], (myPosition, force) => {
-    if (force) return true
-    return Boolean(myPosition)
-  })
 
   const page = h('PollShow -chooseOne', [
     h('section.details', [
@@ -47,13 +42,28 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
         updatePollDoc()
       }
     }),
-    when(showProgress, [
-      Results({ pollDoc, avatar }),
-      Positions({ pollDoc, avatar, timeago, name })
-    ])
+    Progress({ pollDoc, avatar, timeago, name })
   ])
 
   return page
+
+  function Progress ({ pollDoc, avatar, timeago, name }) {
+    const forceShow = Value(false)
+    const showProgress = computed([pollDoc.myPosition, forceShow], (myPosition, force) => {
+      if (force) return true
+      return Boolean(myPosition)
+    })
+
+    return when(showProgress,
+      [
+        Results({ pollDoc, avatar }),
+        Positions({ pollDoc, avatar, timeago, name })
+      ],
+      h('div.sneakpeak', { 'ev-click': ev => forceShow.set(true) },
+        'see results'
+      )
+    )
+  }
 
   function Positions ({ pollDoc, avatar, timeago, name }) {
     return h('section.PollPositions', [
@@ -106,6 +116,7 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
 
     const className = computed([pollDoc.myPosition, forceShow], (myPosition, force) => {
       if (force) return '-show'
+      if (myPosition === false) return '-hidden'
       return !myPosition ? '-show' : '-hidden'
     })
 
