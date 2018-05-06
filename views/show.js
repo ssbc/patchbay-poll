@@ -42,12 +42,12 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
         updatePollDoc()
       }
     }),
-    Progress({ pollDoc, avatar, timeago, name })
+    Progress({ pollDoc, avatar, timeago, name, mdRenderer })
   ])
 
   return page
 
-  function Progress ({ pollDoc, avatar, timeago, name }) {
+  function Progress ({ pollDoc, avatar, timeago, name, mdRenderer }) {
     const forceShow = Value(false)
     const showProgress = computed([pollDoc.myPosition, forceShow], (myPosition, force) => {
       if (force) return true
@@ -57,7 +57,7 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
     return when(showProgress,
       [
         Results({ pollDoc, avatar }),
-        Positions({ pollDoc, avatar, timeago, name })
+        Positions({ pollDoc, avatar, timeago, name, mdRenderer })
       ],
       h('div.sneakpeak', { 'ev-click': ev => forceShow.set(true) },
         'see results'
@@ -65,7 +65,7 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
     )
   }
 
-  function Positions ({ pollDoc, avatar, timeago, name }) {
+  function Positions ({ pollDoc, avatar, timeago, name, mdRenderer }) {
     return h('section.PollPositions', [
       h('h2', ['History']),
       h('div.positions', map(pollDoc.positions, position => {
@@ -82,7 +82,7 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
               '-',
               h('div.choice', position.choice)
             ]),
-            h('div.reason', position.reason)
+            h('div.reason', mdRenderer(position.reason))
           ])
         ])
       }))
