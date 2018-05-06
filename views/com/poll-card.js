@@ -11,7 +11,7 @@ module.exports = function PollCard ({ msg, mdRenderer, onClick }) {
 
   return h('PollCard', { className: 'Markdown', 'ev-click': onClick }, [
     h('h1', title),
-    h('div.body', mdRenderer(body)),
+    h('div.body', mdRenderer(body || '')),
     h('div.closesAt', [
       'closes at: ',
       `${time},  ${date} ${zone}`

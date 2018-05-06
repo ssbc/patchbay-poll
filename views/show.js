@@ -28,7 +28,7 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
   const page = h('PollShow -chooseOne', [
     h('section.details', [
       h('h1', title),
-      h('div.body', mdRenderer(body)),
+      h('div.body', mdRenderer(body || '')),
       h('div.closesAt', [
         h('div.label', 'Closes at'),
         printClosesAt(closesAt)
