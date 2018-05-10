@@ -9,7 +9,7 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
   if (!timeago) timeago = defaultTimeago
   if (!name) name = defaultName
 
-  const { title, body, closesAt: closesAtString, details: {choices} } = parseChooseOnePoll(msg)
+  const { title, author, body, closesAt: closesAtString, details: {choices} } = parseChooseOnePoll(msg)
   const closesAt = new Date(closesAtString)
 
   // TODO use parseChooseOnePoll or scuttlePoll
@@ -25,6 +25,8 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
     })
   }
 
+  console.log(msg.value.author)
+
   const page = h('PollShow -chooseOne', [
     h('section.details', [
       h('h1', title),
@@ -32,6 +34,10 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
       h('div.closesAt', [
         h('div.label', 'Closes at'),
         printClosesAt(closesAt)
+      ]),
+      h('div.createdBy', [
+        h('div.label', 'Created by: '),
+        avatar(msg.value.author)
       ])
     ]),
     NewPosition({
