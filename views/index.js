@@ -1,74 +1,63 @@
-const { h, Value } = require('mutant')
+const { h, Value, computed, watch } = require('mutant')
 const { parseChooseOnePoll } = require('ssb-poll-schema')
 const Scroller = require('mutant-scroll')
-const next = require('pull-next-step')
+const next = require('pull-next-query')
 
 const PollCard = require('./com/poll-card')
+
+const FUTURE = 'future'
+const PAST = 'past'
 
 module.exports = function pollIndex ({ createPollStream, mdRenderer, showPoll, showNewPoll }) {
   if (!mdRenderer) mdRenderer = (text) => text
 
-  // var viewMode = Value('future')
-  var page = createPage('future')
+  var viewMode = Value(PAST)
 
-  // this doesn't work
-  // viewMode(updateToMode)
-  // function updateToMode (mode) {
-  //   console.log(mode)
-  //   const parentEl = page.parentElement
-  //   if (!parentEl) {
-  //     console.log('not there yet!')
-  //     setTimeout(() => updateToMode(mode), 200)
-  //     return
-  //   }
-  //   parentEl.removeChild(page)
-  //   parentEl.appendChild(createPage(mode))
-  // }
+  const polls = h('div', computed(viewMode, mode => {
+    return Scroller({
+      classList: ['PollIndex'],
+      streamToTop: StepperStream({ old: false, live: true }, mode),
+      streamToBottom: StepperStream({ reverse: true }, mode),
+      render: (msg) => {
+        const onClick = () => showPoll(msg)
+        return PollCard({ msg, mdRenderer, onClick })
+      }
+    })
+  }))
+
+  const page = h('Page -polls', [
+    h('header', [
+      h('h1', ['Polls - ', viewMode]),
+      h('button', { 'ev-click': showNewPoll }, 'New Poll'),
+      h('div.show', [
+        'Show: ',
+        h('button', { 'ev-click': () => viewMode.set(FUTURE) }, 'Open'),
+        h('button', { 'ev-click': () => viewMode.set(PAST) }, 'Closed')
+      ])
+    ]),
+    polls
+  ])
 
   page.title = '/polls'
   return page
 
-  function createPage (mode) {
-    const base = {
-      classList: ['PollIndex'],
-      prepend: h('header', [
-        h('h1', `Polls ${mode}`),
-        h('button', { 'ev-click': showNewPoll }, 'New Poll')
-        // h('div.show', [
-        //   'Show: ',
-        //   h('button', { 'ev-click': () => viewMode.set('future') }, 'Open'),
-        //   h('button', { 'ev-click': () => viewMode.set('past') }, 'Closed')
-        // ])
-      ])
-    }
-
-    switch (mode) {
-      case 'future':
-        return Scroller(Object.assign({}, base, {
-          streamToTop: next(createPollStream, { old: false, limit: 100, property: ['value', 'timestamp'] }),
-          streamToBottom: next(createPollStream, { reverse: true, limit: 100, live: false, property: ['value', 'timestamp'] }),
-          render: (msg) => {
-            const { closesAt } = parseChooseOnePoll(msg)
-
-            if (new Date(closesAt) < new Date()) return// TODO figure out nice way to make this update
-
-            const onClick = () => showPoll(msg)
-            return PollCard({ msg, mdRenderer, onClick })
+  function StepperStream (opts, mode = FUTURE) {
+    console.log('mode', mode)
+    const defaultOpts = {
+      limit: 100,
+      query: [{
+        $filter: {
+          value: {
+            timestamp: { $gt: 0 },
+            content: { type: 'poll' }
           }
-        }))
-
-      // TODO get logic right - I just flipped the streamToTop/Bottom && render filter
-      // case 'past':
-      //   return Scroller(Object.assign({}, {
-      //     streamToTop: next(createPollStream, { reverse: true, limit: 100, live: false, property: ['value', 'timestamp'] }),
-      //     streamToBottom: next(createPollStream, { old: false, limit: 100, property: ['value', 'timestamp'] }),
-      //     render: (msg) => {
-      //       const { closesAt } = parsePoll(msg)
-
-      //       if (new Date(closesAt) > new Date()) return// TODO figure out nice way to make this update
-      //       return PollCard({ msg, mdRenderer })
-      //     }
-      //   }))
+        }
+      }]
     }
+    if (mode === FUTURE) defaultOpts.query[0].$filter.value.content.closesAt = { $gt: new Date().toISOString() }
+    if (mode === PAST) defaultOpts.query[0].$filter.value.content.closesAt = { $lt: new Date().toISOString() }
+    const _opts = Object.assign({}, defaultOpts, opts)
+
+    return next(createPollStream, _opts)
   }
 }
