@@ -1,5 +1,4 @@
-const { h, Value, computed, watch } = require('mutant')
-const { parseChooseOnePoll } = require('ssb-poll-schema')
+const { h, Value, computed } = require('mutant')
 const Scroller = require('mutant-scroll')
 const next = require('pull-next-query')
 

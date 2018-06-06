@@ -9,7 +9,7 @@ const server = Server()
 
 const otherFeed = server.createFeed()
 // const {position: {async: {buildChooseOne}}} = require('scuttle-poll')(Server())
-const scuttlePoll = require('scuttle-poll')(server)
+const scuttle = require('scuttle-poll')(server)
 const { isPosition, getPositionErrors } = require('ssb-poll-schema')
 const { content: mockContent } = require('../mock-poll')
 
@@ -30,20 +30,32 @@ const opts = {
   closesAt: mockContent.closesAt
 }
 
-scuttlePoll.poll.async.publishChooseOne(opts, function (err, msg) {
-  const buildChooseOne = scuttlePoll.position.async.buildChooseOne
-  buildChooseOne({poll: msg, choice: 0, reason: 'This is the bestest idea you have ever had hermano!!!'}, function (err, newPosition) {
+// publish a poll
+// give it one position (from someone else)
+scuttle.poll.async.publishChooseOne(opts, function (err, poll) {
+  const buildChooseOne = scuttle.position.async.buildChooseOne
+
+  buildChooseOne({poll, choice: 0, reason: 'This is the bestest idea you have ever had hermano!!!'}, function (err, newPosition) {
     otherFeed.publish(newPosition, (err, data) => {
       const container = h('div', { style }, [
         Page({
-          msg,
-          scuttlePoll: scuttlePoll,
+          poll,
+          scuttle,
           onPositionPublished: (success) => {
             console.log('position successfully published', success)
           }
         })
       ])
 
+      setTimeout(
+        () => {
+          scuttle.poll.async.publishUpdatedClosingTime(
+            { poll, closesAt: '2030-03-20T03:40:06.222Z' },
+            console.log
+          )
+        },
+        5000
+      )
       document.body.appendChild(container)
     })
   })

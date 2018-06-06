@@ -9,7 +9,6 @@ module.exports = function PollCard ({ scuttle, msg, mdRenderer, onClick }) {
   const closesAt = computed(pollDoc.closesAt, t => {
     if (!t) return
     const dateTime = new Date(t)
-    console.log('beep',msg.key, dateTime)
     const [ _, time, zone ] = dateTime.toTimeString().match(/^(\d+:\d+).*(\(\w+\))$/)
     const date = dateTime.toDateString()
     return `${time},  ${date} ${zone}`

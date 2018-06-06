@@ -3,43 +3,34 @@ const { parseChooseOnePoll } = require('ssb-poll-schema')
 
 module.exports = PollShow
 
-function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, timeago, name }) {
+function PollShow ({ poll, scuttle, onPositionPublished, mdRenderer, avatar, timeago, name }) {
   if (!mdRenderer) mdRenderer = (text) => text
   if (!avatar) avatar = defaultAvatar
   if (!timeago) timeago = defaultTimeago
   if (!name) name = defaultName
 
-  const { title, body, closesAt: closesAtString, details: {choices} } = parseChooseOnePoll(msg)
-  const closesAt = new Date(closesAtString)
-
-  // TODO use parseChooseOnePoll or scuttlePoll
-  const pollDoc = Struct({ results: [], positions: [], myPosition: false })
-  pollDoc(console.log)
-  updatePollDoc()
-
-  function updatePollDoc () {
-    scuttlePoll.poll.async.get(msg.key, (err, data) => {
-      if (err) console.error(err)
-
-      pollDoc.set(data)
-    })
-  }
+  const pollDoc = scuttle.poll.obs.get(poll.key)
+  const closesAt = computed(pollDoc.closesAt, t => {
+    if (!t) return
+    const dateTime = new Date(t)
+    const [ _, time, zone ] = dateTime.toTimeString().match(/^(\d+:\d+).*(\(\w+\))$/)
+    const date = dateTime.toDateString()
+    return `${time},  ${date} ${zone}`
+  })
 
   const page = h('PollShow -chooseOne', [
     h('section.details', [
-      h('h1', title),
-      h('div.body', mdRenderer(body || '')),
+      h('h1', pollDoc.title),
+      h('div.body', computed(pollDoc.body, body => mdRenderer(body || ''))),
       h('div.closesAt', [
-        h('div.label', 'Closes at'),
-        printClosesAt(closesAt)
+        h('div.label', [ 'Closes at: ', closesAt ])
       ])
     ]),
     NewPosition({
-      choices,
+      choices: computed(pollDoc, doc => doc.value.content.details.choices || []),
       currentPosition: pollDoc.myPosition,
       onPublish: (success) => {
         onPositionPublished(success)
-        updatePollDoc()
       }
     }),
     Progress({ pollDoc, avatar, timeago, name, mdRenderer })
@@ -112,7 +103,6 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
     })
 
     const forceShow = Value(false)
-    forceShow(console.log)
 
     const className = computed([pollDoc.myPosition, forceShow], (myPosition, force) => {
       if (force) return '-show'
@@ -123,7 +113,7 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
     return h('section.NewPosition', { className }, [
       h('div.field -choices', [
         h('label', 'Choose One'),
-        h('div.inputs', choices.map((choice, index) => {
+        h('div.inputs', map(choices, (choice, index) => {
           var id = `choice-${index}`
           return h('div.choice', {'ev-click': ev => { newPosition.choice.set(index) }}, [
             h('input', { type: 'radio', checked: computed(newPosition.choice, c => c === index), id, name: 'choices' }),
@@ -146,11 +136,11 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
 
     function publish () {
       const content = {
-        poll: parseChooseOnePoll(msg),
+        poll: parseChooseOnePoll(poll),
         choice: resolve(newPosition.choice),
         reason: resolve(newPosition.reason)
       }
-      scuttlePoll.position.async.publishChooseOne(content, (err, success) => {
+      scuttle.position.async.publishChooseOne(content, (err, success) => {
         if (err) return console.log(err) // put warnings on form
 
         onPublish(success)
