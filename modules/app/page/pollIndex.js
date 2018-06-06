@@ -33,11 +33,10 @@ exports.create = function (api) {
   }
 
   function pollIndexPage (path) {
+    const scuttle = ScuttlePoll(api.sbot.obs.connection)
+
     const indexPage = PollIndex({
-      createPollStream: (opts) => pull(
-        api.feed.pull.type('poll')(opts), // TODO update patchcore
-        pull.filter(isPoll)
-      ),
+      scuttle,
       mdRenderer: api.message.html.markdown,
       showPoll: api.app.sync.goTo,
       showNewPoll
@@ -47,7 +46,7 @@ exports.create = function (api) {
 
     function showNewPoll () {
       const newPoll = PollNew({
-        scuttlePoll: ScuttlePoll(api.sbot.obs.connection),
+        scuttlePoll: scuttle,
         onPollPublished: (success) => {
           console.log('onPollPublished', success)
           modal.close()

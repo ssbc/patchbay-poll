@@ -2,8 +2,9 @@
 const { parseChooseOnePoll, isPoll } = require('ssb-poll-schema')
 const { h, Struct, map } = require('mutant')
 
-module.exports = function PollCard ({ msg, mdRenderer, onClick }) {
+module.exports = function PollCard ({ scuttle, msg, mdRenderer, onClick }) {
   if (!isPoll) return
+  // const pollDoc = getPoll({ scuttle, msg })
   const { title, body, closesAt: closesAtString } = parseChooseOnePoll(msg)
 
   const closesAt = new Date(closesAtString)
@@ -18,44 +19,32 @@ module.exports = function PollCard ({ msg, mdRenderer, onClick }) {
       `${time},  ${date} ${zone}`
     ])
   ])
-
-  // h('div.choices', map(choices, choice => {
-  //   return h('button', choice)
-  //   // return h('button', { 'ev-click': publishPosition(choice, reason) }, choice)
-  // })),
-  // h('div.positions', map(positions, position => {
-  //   return h('pre.position', JSON.stringify(position.value.content, null, 2))
-  //   // name, position, reason
-  //   // e.g. mix "YES!", "it's a good idea"
-  //   // decorated position
-  //   // { key, value, author: @mix, choice: "YES", reason: "it's a good idea" }
-  // }))
 }
 
-/// // LEFTOVERS vv
-// TODO - make the poll.obs.get to collapse all this !
-function getPoll ({ msg, server }) {
-  const { title, body, closesAt, pollDetails: { choices } } = msg.value.content
-  console.log(msg)
+// NOTE - this is one way to handle getting the details into a card aynchronosly
+// this is going to be needed for updating the closesAt
+//
+// function getPoll ({ msg, scuttle }) {
+//   const { title, body, closesAt, pollDetails: { choices } } = msg.value.content
 
-  // build an mutant obs
-  const poll = Struct({
-    title,
-    body,
-    closesAt: new Date(closesAt).toString(),
-    choices,
-    positions: [],
-    results: []
-  })
-  updateDetails(msg, poll)
-  return poll
+//   // build a mutant obs
+//   const pollDoc = Struct({
+//     title,
+//     body,
+//     closesAt: new Date(closesAt).toString(),
+//     choices,
+//     positions: [],
+//     results: []
+//   })
+//   updateDetails(msg, pollDoc)
+//   return pollDoc
 
-  function updateDetails (msg, poll) {
-    ScuttlePoll(server).poll.async.get(msg.key, (err, _poll) => {
-      if (err) throw err
+//   function updateDetails (msg, poll) {
+//     scuttle.poll.async.get(msg.key, (err, _poll) => {
+//       if (err) throw err
 
-      poll.positions.set(_poll.positions)
-      poll.results.set(_poll.results)
-    })
-  }
-}
+//       poll.positions.set(_poll.positions)
+//       poll.results.set(_poll.results)
+//     })
+//   }
+// }

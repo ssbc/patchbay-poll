@@ -1,10 +1,13 @@
 const { h } = require('mutant')
 const pull = require('pull-stream')
+const ScuttlePoll = require('scuttle-poll')
 
 const server = require('scuttle-testbot')
   .use(require('ssb-backlinks'))
   .use(require('ssb-query'))
   .call()
+
+const scuttle = ScuttlePoll(server)
 
 const Page = require('../../views/index')
 require('../insert-styles')()
@@ -24,6 +27,7 @@ pull(
 function drawPage () {
   const page = Page({
     // TODO move this upstream into scuttle-poll
+    scuttle,
     createPollStream: server.query.read,
     showNewPoll: () => console.log('Opened new poll thing'),
     openNewPage: () => console.log('Opened new page')
