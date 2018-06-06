@@ -3,7 +3,7 @@ const { parseChooseOnePoll, isPoll } = require('ssb-poll-schema')
 const { h, Struct, map } = require('mutant')
 
 module.exports = function PollCard ({ scuttle, msg, mdRenderer, onClick }) {
-  if (!isPoll) return
+  if (!isPoll(msg)) return
   // const pollDoc = getPoll({ scuttle, msg })
   const { title, body, closesAt: closesAtString } = parseChooseOnePoll(msg)
 
