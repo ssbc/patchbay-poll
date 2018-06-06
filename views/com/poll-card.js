@@ -1,61 +1,23 @@
-// const ScuttlePoll = require('scuttle-poll')
-const { parseChooseOnePoll, isPoll } = require('ssb-poll-schema')
-const { h, Struct, map } = require('mutant')
+const { isPoll } = require('ssb-poll-schema')
+const { h, computed } = require('mutant')
 
-module.exports = function PollCard ({ msg, mdRenderer, onClick }) {
+module.exports = function PollCard ({ scuttle, msg, mdRenderer, onClick }) {
   if (!isPoll) return
-  const { title, body, closesAt: closesAtString } = parseChooseOnePoll(msg)
 
-  const closesAt = new Date(closesAtString)
-  const date = closesAt.toDateString()
-  const [ _, time, zone ] = closesAt.toTimeString().match(/^(\d+:\d+).*(\(\w+\))$/)
+  const pollDoc = scuttle.poll.obs.get(msg.key)
+
+  const closesAt = computed(pollDoc.closesAt, t => {
+    if (!t) return
+    const dateTime = new Date(t)
+    console.log('beep',msg.key, dateTime)
+    const [ _, time, zone ] = dateTime.toTimeString().match(/^(\d+:\d+).*(\(\w+\))$/)
+    const date = dateTime.toDateString()
+    return `${time},  ${date} ${zone}`
+  })
 
   return h('PollCard', { className: 'Markdown', 'ev-click': onClick }, [
-    h('h1', title),
-    h('div.body', mdRenderer(body || '')),
-    h('div.closesAt', [
-      'closes at: ',
-      `${time},  ${date} ${zone}`
-    ])
+    h('h1', pollDoc.title),
+    h('div.body', computed(pollDoc.body, body => mdRenderer(body || ''))),
+    h('div.closesAt', [ 'closes at: ', closesAt ])
   ])
-
-  // h('div.choices', map(choices, choice => {
-  //   return h('button', choice)
-  //   // return h('button', { 'ev-click': publishPosition(choice, reason) }, choice)
-  // })),
-  // h('div.positions', map(positions, position => {
-  //   return h('pre.position', JSON.stringify(position.value.content, null, 2))
-  //   // name, position, reason
-  //   // e.g. mix "YES!", "it's a good idea"
-  //   // decorated position
-  //   // { key, value, author: @mix, choice: "YES", reason: "it's a good idea" }
-  // }))
-}
-
-/// // LEFTOVERS vv
-// TODO - make the poll.obs.get to collapse all this !
-function getPoll ({ msg, server }) {
-  const { title, body, closesAt, pollDetails: { choices } } = msg.value.content
-  console.log(msg)
-
-  // build an mutant obs
-  const poll = Struct({
-    title,
-    body,
-    closesAt: new Date(closesAt).toString(),
-    choices,
-    positions: [],
-    results: []
-  })
-  updateDetails(msg, poll)
-  return poll
-
-  function updateDetails (msg, poll) {
-    ScuttlePoll(server).poll.async.get(msg.key, (err, _poll) => {
-      if (err) throw err
-
-      poll.positions.set(_poll.positions)
-      poll.results.set(_poll.results)
-    })
-  }
 }

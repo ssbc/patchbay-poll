@@ -18,7 +18,7 @@
     "lodash": "^4.17.10",
     "mutant": "^3.22.1",
     "mutant-scroll": "0.0.5",
-    "pull-stream": "^3.6.2",
+    "pull-stream": "^3.6.8",
     "read-directory": "^3.0.0",
     "require-style": "^1.0.1",
     "scuttle-poll": "^1.0.2",

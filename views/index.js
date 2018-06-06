@@ -8,10 +8,11 @@ const PollCard = require('./com/poll-card')
 const FUTURE = 'future'
 const PAST = 'past'
 
-module.exports = function pollIndex ({ createPollStream, mdRenderer, showPoll, showNewPoll }) {
+// TODO extract createPollStream to scuttle-poll
+module.exports = function pollIndex ({ scuttle, createPollStream, mdRenderer, showPoll, showNewPoll }) {
   if (!mdRenderer) mdRenderer = (text) => text
 
-  var viewMode = Value(PAST)
+  var viewMode = Value(FUTURE)
 
   const polls = h('div', computed(viewMode, mode => {
     return Scroller({
@@ -20,7 +21,7 @@ module.exports = function pollIndex ({ createPollStream, mdRenderer, showPoll, s
       streamToBottom: StepperStream({ reverse: true }, mode),
       render: (msg) => {
         const onClick = () => showPoll(msg)
-        return PollCard({ msg, mdRenderer, onClick })
+        return PollCard({ scuttle, msg, mdRenderer, onClick })
       }
     })
   }))
