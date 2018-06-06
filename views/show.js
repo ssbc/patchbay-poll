@@ -1,5 +1,5 @@
 const { h, Struct, Value, resolve, computed, map, when } = require('mutant')
-const { parseChooseOnePoll } = require('ssb-poll-schema')
+const { parseChooseOnePoll, isPosition } = require('ssb-poll-schema')
 
 module.exports = PollShow
 
@@ -14,7 +14,6 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
 
   // TODO use parseChooseOnePoll or scuttlePoll
   const pollDoc = Struct({ results: [], positions: [], myPosition: false })
-  pollDoc(console.log)
   updatePollDoc()
 
   function updatePollDoc () {
@@ -69,6 +68,7 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
     return h('section.PollPositions', [
       h('h2', ['History']),
       h('div.positions', map(pollDoc.positions, position => {
+        if (!isPosition(position)) return
         const {author, timestamp} = position.value
         // postion, reason, time, avatar, name
         return h('PollPosition', [
@@ -82,7 +82,7 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
               '-',
               h('div.choice', position.choice)
             ]),
-            h('div.reason', mdRenderer(position.reason))
+            h('div.reason', mdRenderer(position.reason || ''))
           ])
         ])
       }))
