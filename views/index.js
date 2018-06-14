@@ -1,20 +1,32 @@
-const { h, Value, computed, watch } = require('mutant')
+const { h, Value, computed } = require('mutant')
 const Scroller = require('mutant-scroll')
 
 const PollCard = require('./com/poll-card')
 
 const OPEN = 'open'
 const CLOSED = 'closed'
+const ALL = 'all'
+const MINE = 'mine'
 
 module.exports = function pollIndex ({ scuttle, createPollStream, mdRenderer, showPoll, showNewPoll }) {
   if (!mdRenderer) mdRenderer = (text) => text
 
-  var viewMode = Value(OPEN)
+  var mode = Value(OPEN)
 
-  const polls = h('div', computed(viewMode, mode => {
+  const prepend = [
+    h('button -primary', { 'ev-click': showNewPoll }, 'New Poll'),
+    h('div.show', [
+      'Show: ',
+      FilterButton(OPEN),
+      FilterButton(CLOSED),
+      FilterButton(ALL),
+      FilterButton(MINE)
+    ])
+  ]
+
+  const polls = computed(mode, mode => {
     return Scroller({
-      classList: ['PollIndex'],
-
+      prepend,
       streamToTop: scuttle.poll.pull[mode]({ old: false, live: true }),
       streamToBottom: scuttle.poll.pull[mode]({ reverse: true, live: false }),
 
@@ -23,20 +35,18 @@ module.exports = function pollIndex ({ scuttle, createPollStream, mdRenderer, sh
         return PollCard({ scuttle, msg, mdRenderer, onClick })
       }
     })
-  }))
+  })
 
-  const page = h('Page -polls', [
-    h('header', [
-      h('h1', ['Polls - ', viewMode]),
-      h('button', { 'ev-click': showNewPoll }, 'New Poll'),
-      h('div.show', [
-        'Show: ',
-        h('button', { 'ev-click': () => viewMode.set(OPEN) }, 'Open'),
-        h('button', { 'ev-click': () => viewMode.set(CLOSED) }, 'Closed')
-      ])
-    ]),
+  const page = h('PollIndex', [
     polls
   ])
+
+  function FilterButton (m) {
+    return h('button', {
+      'ev-click': () => mode.set(m),
+      className: computed(mode, mode => m === mode ? '-active' : '')
+    }, m)
+  }
 
   page.title = '/polls'
   return page
