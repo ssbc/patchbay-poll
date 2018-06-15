@@ -25,6 +25,7 @@ exports.create = function (api) {
   function pollShowPage (msg) {
     return PollShow({
       msg,
+      className: 'Scroller',
       scuttlePoll: ScuttlePoll(api.sbot.obs.connection),
       onPositionPublished: () => {
         console.log('BOOM')

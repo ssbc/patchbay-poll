@@ -3,11 +3,17 @@ const { parseChooseOnePoll, isPosition } = require('ssb-poll-schema')
 
 module.exports = PollShow
 
-function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, timeago, name }) {
-  if (!mdRenderer) mdRenderer = (text) => text
-  if (!avatar) avatar = defaultAvatar
-  if (!timeago) timeago = defaultTimeago
-  if (!name) name = defaultName
+function PollShow (opts = {}) {
+  const {
+    msg,
+    scuttlePoll,
+    onPositionPublished,
+    mdRenderer = (text) => text,
+    avatar = defaultAvatar,
+    timeago = defaultTimeago,
+    name = defaultName,
+    className = ''
+  } = opts
 
   const { title, body, closesAt: closesAtString, details: {choices} } = parseChooseOnePoll(msg)
   const closesAt = new Date(closesAtString)
@@ -24,7 +30,7 @@ function PollShow ({ msg, scuttlePoll, onPositionPublished, mdRenderer, avatar, 
     })
   }
 
-  const page = h('PollShow -chooseOne', [
+  const page = h('PollShow -chooseOne', { className }, [
     h('section.details', [
       h('h1', title),
       h('div.body', mdRenderer(body || '')),
