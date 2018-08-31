@@ -15,7 +15,7 @@ exports.create = (api) => {
     // loc = location
     const routes = [
       [ loc => loc.page === 'polls', pages.pollIndex ],
-      [ loc => isPoll(loc), pages.pollShow ]
+      [ loc => isPoll.chooseOne(loc), pages.pollShow ]
     ]
 
     return [...routes, ...sofar]

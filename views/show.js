@@ -12,7 +12,8 @@ function PollShow (opts = {}) {
     avatar = defaultAvatar,
     timeago = defaultTimeago,
     name = defaultName,
-    className = ''
+    className = '',
+    // updateStream
   } = opts
 
   const { title, body, closesAt: closesAtString, details: {choices} } = parseChooseOnePoll(msg)
@@ -22,6 +23,8 @@ function PollShow (opts = {}) {
   const pollDoc = Struct({ results: [], positions: [], myPosition: false })
   updatePollDoc()
 
+  // TODO use updateStream to know when to trigger updates
+  //   - don't update while NewPosition is active
   function updatePollDoc () {
     scuttlePoll.poll.async.get(msg.key, (err, data) => {
       if (err) console.error(err)
@@ -70,6 +73,7 @@ function PollShow (opts = {}) {
     )
   }
 
+  // TODO rework this to show all messages
   function Positions ({ pollDoc, avatar, timeago, name, mdRenderer }) {
     return h('section.PollPositions', [
       h('h2', ['History']),
@@ -111,6 +115,7 @@ function PollShow (opts = {}) {
     ])
   }
 
+  // TODO extract this
   function NewPosition ({ choices, currentPosition, onPublish }) {
     const newPosition = Struct({
       choice: Value(),
@@ -151,12 +156,12 @@ function PollShow (opts = {}) {
     ])
 
     function publish () {
-      const content = {
+      const position = {
         poll: parseChooseOnePoll(msg),
         choice: resolve(newPosition.choice),
         reason: resolve(newPosition.reason)
       }
-      scuttlePoll.position.async.publishChooseOne(content, (err, success) => {
+      scuttlePoll.position.async.publishChooseOne(position, (err, success) => {
         if (err) return console.log(err) // put warnings on form
 
         onPublish(success)
