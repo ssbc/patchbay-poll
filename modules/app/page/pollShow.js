@@ -31,7 +31,7 @@ exports.create = function (api) {
         console.log('BOOM')
       },
       mdRenderer: api.message.html.markdown,
-      avatar: api.about.html.avatar,
+      avatar: feedId => api.about.html.avatar(feedId),
       timeago: api.lib.obs.timeAgo,
       name: api.about.obs.name
     })
