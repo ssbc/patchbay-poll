@@ -23,13 +23,11 @@ PollIndex {
 
       margin: .5rem 0
 
-      button {}
       div.show {
         display: flex
         align-items: center
 
         button {
-          margin-left: .5rem
         }
       }
     }

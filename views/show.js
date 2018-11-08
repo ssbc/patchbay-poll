@@ -12,11 +12,11 @@ function PollShow (opts = {}) {
     avatar = defaultAvatar,
     timeago = defaultTimeago,
     name = defaultName,
-    className = '',
+    className = ''
     // updateStream
   } = opts
 
-  const { title, body, closesAt: closesAtString, details: {choices} } = parseChooseOnePoll(msg)
+  const { title, body, closesAt: closesAtString, details: { choices } } = parseChooseOnePoll(msg)
   const closesAt = new Date(closesAtString)
 
   // TODO use parseChooseOnePoll or scuttlePoll
@@ -79,7 +79,7 @@ function PollShow (opts = {}) {
       h('h2', ['History']),
       h('div.positions', map(pollDoc.positions, position => {
         if (!isPosition(position)) return
-        const {author, timestamp} = position.value
+        const { author, timestamp } = position.value
         // postion, reason, time, avatar, name
         return h('PollPosition', [
           h('div.left', [
@@ -136,7 +136,7 @@ function PollShow (opts = {}) {
         h('label', 'Choose One'),
         h('div.inputs', choices.map((choice, index) => {
           var id = `choice-${index}`
-          return h('div.choice', {'ev-click': ev => { newPosition.choice.set(index) }}, [
+          return h('div.choice', { 'ev-click': ev => { newPosition.choice.set(index) } }, [
             h('input', { type: 'radio', checked: computed(newPosition.choice, c => c === index), id, name: 'choices' }),
             h('label', { for: id }, choice)
           ])
@@ -191,6 +191,6 @@ function defaultName (feedId) {
 
 function printClosesAt (dateTime) {
   const date = dateTime.toDateString()
-  const [ _, time, zone ] = dateTime.toTimeString().match(/^(\d+:\d+).*(\(\w+\))$/)
+  const [ _, time, zone ] = closesAt.toTimeString().match(/^(\d+:\d+).*(\([\w\s]+\))$/)
   return `${time}, ${date} ${zone}`
 }

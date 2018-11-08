@@ -33,7 +33,8 @@ module.exports = function pollIndex ({ scuttle, createPollStream, mdRenderer, sh
       render: (msg) => {
         const onClick = () => showPoll(msg)
         return PollCard({ scuttle, msg, mdRenderer, onClick })
-      }
+      },
+      overflowY: 'auto'
     })
   })
 
@@ -44,7 +45,7 @@ module.exports = function pollIndex ({ scuttle, createPollStream, mdRenderer, sh
   function FilterButton (m) {
     return h('button', {
       'ev-click': () => mode.set(m),
-      className: computed(mode, mode => m === mode ? '-active' : '')
+      className: computed(mode, mode => m === mode ? '-primary' : '')
     }, m)
   }
 

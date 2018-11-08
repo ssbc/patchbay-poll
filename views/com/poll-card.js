@@ -1,6 +1,6 @@
 // const ScuttlePoll = require('scuttle-poll')
 const { parseChooseOnePoll, parseMeetingTimePoll, isPoll } = require('ssb-poll-schema')
-const { h, Struct, map } = require('mutant')
+const { h } = require('mutant')
 
 module.exports = function PollCard ({ scuttle, msg, mdRenderer, onClick }) {
   var content
@@ -12,7 +12,7 @@ module.exports = function PollCard ({ scuttle, msg, mdRenderer, onClick }) {
 
   const closesAt = new Date(closesAtString)
   const date = closesAt.toDateString()
-  const [ _, time, zone ] = closesAt.toTimeString().match(/^(\d+:\d+).*(\(\w+\))$/)
+  const [ _, time, zone ] = closesAt.toTimeString().match(/^(\d+:\d+).*(\([\w\s]+\))$/)
 
   return h('PollCard', { className: 'Markdown', 'ev-click': onClick }, [
     h('h1', title),
