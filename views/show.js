@@ -191,6 +191,6 @@ function defaultName (feedId) {
 
 function printClosesAt (dateTime) {
   const date = dateTime.toDateString()
-  const [ _, time, zone ] = closesAt.toTimeString().match(/^(\d+:\d+).*(\([\w\s]+\))$/)
+  const [ _, time, zone ] = dateTime.toTimeString().match(/^(\d+:\d+).*(\([\w\s]+\))$/)
   return `${time}, ${date} ${zone}`
 }
